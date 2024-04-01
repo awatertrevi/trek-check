@@ -73,6 +73,13 @@
   const result = ref(null);
   const totalWeight = ref(0);
   const allowedWeight = ref(0);
+
+  watch(selectedLicense, (newValue) => {
+      if (newValue) {
+          const licenseInfo = licenses.find(l => l.type === newValue);
+          allowedWeight.value = licenseInfo.maxCombinationWeight;
+      }
+  });
   
   const fetchVehicleDetails = async (licensePlate) => {
     try {
