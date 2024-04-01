@@ -5,12 +5,11 @@
       <div class="container mx-auto flex flex-col justify-between items-center">
         <img src="/logo.png" alt="Logo" class="h-48 w-48">
           <h1 class="text-5xl font-semibold mt-4">TrekCheck</h1>
+          <h2 class="text-2xl mt-1 mb-3 text-center p-4">Controleer of je de combinatie auto/aanhangwagen mag rijden met jouw rijbewijs.</h2>
       </div>
     </header>
 
       <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
-
-        
         <div class="-mx-3 md:flex mb-6">
           <div class="md:w-full px-3 mb-6 md:mb-0">
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="license-type">
@@ -75,10 +74,10 @@
   const allowedWeight = ref(0);
 
   watch(selectedLicense, (newValue) => {
-      if (newValue) {
-          const licenseInfo = licenses.find(l => l.type === newValue);
-          allowedWeight.value = licenseInfo.maxCombinationWeight;
-      }
+    if (newValue) {
+      const licenseInfo = licenses.find(l => l.type === newValue);
+      allowedWeight.value = licenseInfo.maxCombinationWeight;
+    }
   });
   
   const fetchVehicleDetails = async (licensePlate) => {
