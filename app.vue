@@ -3,7 +3,7 @@
 
         <header class="text-gray-800 py-4">
       <div class="container mx-auto flex flex-col justify-between items-center">
-        <img src="@/assets/logo.png" alt="Logo" class="h-48 w-48">
+        <img src="/logo.png" alt="Logo" class="h-48 w-48">
           <h1 class="text-5xl font-semibold mt-4">TrekCheck</h1>
       </div>
     </header>

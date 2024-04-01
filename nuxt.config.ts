@@ -14,6 +14,15 @@ export default defineNuxtConfig({
             { name: 'author', content: 'Trevi Awater' },
             { name: 'description', content: 'Controleer of je de combinatie auto/aanhangwagen mag rijden met jouw rijbewijs.' },
         
+            // Favicon
+            { name: 'apple-touch-icon', content: '/apple-touch-icon.png' },
+            { name: 'icon', content: '/favicon-32x32.png' },
+            { name: 'icon', content: '/favicon-16x16.png' },
+            { name: 'manifest', content: '/site.webmanifest' },
+            { name: 'msapplication-TileColor', content: '#da532c' },
+            { name: 'theme-color', content: '#ffffff' },
+
+
             // Open Graph / Facebook
             { property: 'og:title', content: 'TrekCheck' },
             { property: 'og:description', content: 'Controleer snel of je de combinatie van auto en caravan mag rijden met je huidige rijbewijs.' },
