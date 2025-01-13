@@ -1,0 +1,4 @@
+User-Agent: *
+Allow: /
+
+Sitemap: https://trek-check.nl/sitemap.xml
