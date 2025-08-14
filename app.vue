@@ -41,14 +41,34 @@
           Check Combinatie
         </button>
         <div v-if="result !== null" class="mt-4">
-          <p v-if="result" class="text-green-500 font-bold">✅ De combinatie is toegestaan!</p>
-          <p v-else class="text-red-500 font-bold">❌ De combinatie is niet toegestaan.</p>
+          <div class="mb-4">
+            <p v-if="result" class="text-green-500 font-bold text-lg">✅ De combinatie is toegestaan!</p>
+            <p v-else class="text-red-500 font-bold text-lg">❌ De combinatie is niet toegestaan.</p>
+          </div>
 
-          <p class="text-gray-600">
-            Totale gewicht: {{ totalWeight }} kg.
-            <br />
-            Toegestaan voor rijbewijs {{ selectedLicense }}: {{ allowedWeight }} kg.
-        </p>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="font-semibold text-gray-700 mb-3">Validatie Details:</h3>
+            
+            <!-- Success messages -->
+            <div v-if="validationSuccess.length > 0" class="mb-3">
+              <div v-for="success in validationSuccess" :key="success" class="text-green-600 text-sm mb-1">
+                {{ success }}
+              </div>
+            </div>
+
+            <!-- Error messages -->
+            <div v-if="validationErrors.length > 0" class="mb-3">
+              <div v-for="error in validationErrors" :key="error" class="text-red-600 text-sm mb-1">
+                {{ error }}
+              </div>
+            </div>
+
+            <div class="text-gray-600 text-sm mt-3 pt-3 border-t border-gray-200">
+              <strong>Samenvatting:</strong><br>
+              Totale gewicht: {{ totalWeight }} kg<br>
+              Toegestaan voor rijbewijs {{ selectedLicense }}: {{ allowedWeight }} kg
+            </div>
+          </div>
         </div>
       </div>
 
@@ -62,16 +82,19 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, watch } from 'vue';
   import axios from 'axios';
   import licenses from '@/lib/driving-licenses.js';
+  import { validateVehicleCombination } from '@/lib/vehicle-validation.js';
   
   const selectedLicense = ref('');
   const carLicensePlate = ref('');
   const caravanLicensePlate = ref('');
   const result = ref(null);
-  const totalWeight = ref(0);
-  const allowedWeight = ref(0);
+const totalWeight = ref(0);
+const allowedWeight = ref(0);
+const validationErrors = ref([]);
+const validationSuccess = ref([]);
 
   watch(selectedLicense, (newValue) => {
     if (newValue) {
@@ -98,11 +121,17 @@
 
     const carData = await fetchVehicleDetails(carLicensePlate.value.replace(/-/g, ''));
     const caravanData = await fetchVehicleDetails(caravanLicensePlate.value.replace(/-/g, ''));
+    
     if (carData && caravanData) {
-      totalWeight.value = parseInt(carData.toegestane_maximum_massa_voertuig) + parseInt(caravanData.toegestane_maximum_massa_voertuig);
       const licenseInfo = licenses.find(l => l.type === selectedLicense.value);
-      allowedWeight.value = licenseInfo.maxCombinationWeight;
-      result.value = totalWeight.value <= allowedWeight.value;
+      const validationResult = validateVehicleCombination(carData, caravanData, licenseInfo);
+      
+      // Update reactive values
+      result.value = validationResult.isValid;
+      totalWeight.value = validationResult.totalWeight;
+      allowedWeight.value = validationResult.allowedWeight;
+      validationErrors.value = validationResult.errors;
+      validationSuccess.value = validationResult.success;
     } else {
       alert("Kon niet alle voertuiggegevens ophalen.");
     }
