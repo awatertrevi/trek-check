@@ -37,20 +37,13 @@
             <input v-model="caravanLicensePlate" type="text" id="license-caravan" :disabled="isChecking" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="XY-456-Z">
           </div>
         </div>
-        <div class="mt-4 flex gap-4">
+        <div class="mt-4">
           <button 
             v-if="!isChecking" 
             @click="checkVehicles" 
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Check Combinatie
-          </button>
-          <button 
-            v-if="isChecking" 
-            @click="resetForm" 
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Opnieuw beginnen
           </button>
         </div>
         <div v-if="result !== null" class="mt-4">
@@ -89,12 +82,25 @@
               Toegestaan voor rijbewijs {{ selectedLicense }}: {{ allowedWeight }} kg
             </div>
           </div>
+
+          <!-- Reset button onder de uitleg -->
+          <div v-if="isChecking" class="mt-4 text-center">
+            <button 
+              @click="resetForm" 
+              class="bg-gray-500 hover:bg-gray-600 text-white font-normal py-2 px-4 rounded text-sm focus:outline-none focus:shadow-outline"
+            >
+              Opnieuw beginnen
+            </button>
+          </div>
         </div>
       </div>
 
       <footer class="text-gray-400 text-center text-sm p-4">
         Made with ❤️ by <a href="https://github.com/awatertrevi" class="text-blue-500 hover:text-blue-400" target="_blank" rel="noopener noreferrer">Trevi Awater</a>
-        <div>
+        <div class="mt-2">
+          Voertuiggegevens geleverd door <a href="https://opendata.rdw.nl/" class="text-blue-500 hover:text-blue-400" target="_blank" rel="noopener noreferrer">RDW Open Data</a>
+        </div>
+        <div class="mt-2">
             Legal Disclaimer: Deze applicatie is bedoeld voor informatieve doeleinden. Ik ben niet aansprakelijk voor enige fouten of omissies, of voor de resultaten verkregen uit het gebruik van deze informatie.
         </div>
         </footer>
