@@ -5,7 +5,7 @@
       <div class="container mx-auto flex flex-col justify-between items-center">
         <img src="/logo.png" alt="TrekCheck - Gratis rijbewijs en aanhangwagen combinatie checker" class="w-48">
           <h1 class="text-5xl font-semibold mt-4">TrekCheck</h1>
-          <h2 class="text-2xl mt-1 mb-3 text-center p-4">Gratis online tool: Controleer of je auto/aanhangwagen combinatie toegestaan is met jouw rijbewijs</h2>
+          <h2 class="text-2xl mt-1 mb-3 text-center p-4">Controleer gratis of je auto/aanhangwagen combinatie toegestaan is met jouw rijbewijs</h2>
           <p class="text-lg text-gray-600 text-center max-w-2xl mb-4">
             Gebruik officiële RDW kenteken data om direct te zien of je combinatie van auto en caravan/aanhangwagen mag rijden met je huidige rijbewijs (B, BE, etc.).
           </p>
@@ -40,11 +40,11 @@
             <input v-model="caravanLicensePlate" type="text" id="license-caravan" :disabled="isChecking" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="XY-456-Z">
           </div>
         </div>
-        <div class="mt-4">
+        <div class="mt-4 text-center">
           <button 
             v-if="!isChecking" 
             @click="checkVehicles" 
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Check Combinatie
           </button>
