@@ -47,7 +47,7 @@
           </div>
 
           <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="font-semibold text-gray-700 mb-3">Validatie Details:</h3>
+            <h3 class="font-semibold text-gray-700 mb-3">Uitleg:</h3>
             
             <!-- Success messages -->
             <div v-if="validationSuccess.length > 0" class="mb-3">
