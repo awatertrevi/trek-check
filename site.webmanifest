@@ -1,19 +1,41 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "TrekCheck - Rijbewijs Aanhangwagen Controle",
+    "short_name": "TrekCheck",
+    "description": "Gratis online tool om te controleren of je auto/aanhangwagen combinatie toegestaan is met jouw rijbewijs",
+    "start_url": "/",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "/android-chrome-512x512.png",
             "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logo.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "display": "standalone"
+    "theme_color": "#3b82f6",
+    "background_color": "#f3f4f6",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "nl-NL",
+    "categories": ["utilities", "productivity", "automotive"],
+    "screenshots": [
+        {
+            "src": "/caravan.jpg",
+            "sizes": "1200x630",
+            "type": "image/jpeg",
+            "platform": "wide",
+            "label": "TrekCheck - Caravan aanhangwagen rijbewijs controle"
+        }
+    ]
 }
