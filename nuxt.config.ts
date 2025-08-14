@@ -106,16 +106,11 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
   
-  // Performance optimizations
+  // Performance optimizations for GitHub Pages
   vite: {
     build: {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['vue', 'axios']
-          }
-        }
-      }
+      target: 'esnext',
+      minify: 'esbuild'
     }
   },
   
