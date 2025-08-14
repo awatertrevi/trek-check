@@ -15,7 +15,7 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="license-type">
               Rijbewijs
             </label>
-            <select v-model="selectedLicense" id="license-type" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <select v-model="selectedLicense" id="license-type" :disabled="isChecking" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed">
               <option disabled value="">Kies je rijbewijs</option>
               <option v-for="license in licenses" :key="license.type" :value="license.type">
                 {{ license.type }}
@@ -28,18 +28,31 @@
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="license-car">
               Kenteken Auto
             </label>
-            <input v-model="carLicensePlate" type="text" id="license-car" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" placeholder="AB-123-C">
+            <input v-model="carLicensePlate" type="text" id="license-car" :disabled="isChecking" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="AB-123-C">
           </div>
           <div class="md:w-1/2 px-3">
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="license-caravan">
               Kenteken Aanhangwagen
             </label>
-            <input v-model="caravanLicensePlate" type="text" id="license-caravan" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" placeholder="XY-456-Z">
+            <input v-model="caravanLicensePlate" type="text" id="license-caravan" :disabled="isChecking" class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" placeholder="XY-456-Z">
           </div>
         </div>
-        <button @click="checkVehicles" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          Check Combinatie
-        </button>
+        <div class="mt-4 flex gap-4">
+          <button 
+            v-if="!isChecking" 
+            @click="checkVehicles" 
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Check Combinatie
+          </button>
+          <button 
+            v-if="isChecking" 
+            @click="resetForm" 
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Opnieuw beginnen
+          </button>
+        </div>
         <div v-if="result !== null" class="mt-4">
           <div class="mb-4">
             <p v-if="result" class="text-green-500 font-bold text-lg">✅ De combinatie is toegestaan!</p>
@@ -64,6 +77,13 @@
             </div>
 
             <div class="text-gray-600 text-sm mt-3 pt-3 border-t border-gray-200">
+              <strong>Voertuig Informatie:</strong><br>
+              <div v-if="carInfo" class="mb-2">
+                <strong>Auto:</strong> {{ carInfo.handelsbenaming }} ({{ carInfo.kenteken }}) - {{ carInfo.gewicht }}kg
+              </div>
+              <div v-if="trailerInfo" class="mb-3">
+                <strong>Aanhangwagen:</strong> {{ trailerInfo.handelsbenaming }} ({{ trailerInfo.kenteken }}) - {{ trailerInfo.gewicht }}kg
+              </div>
               <strong>Samenvatting:</strong><br>
               Totale gewicht: {{ totalWeight }} kg<br>
               Toegestaan voor rijbewijs {{ selectedLicense }}: {{ allowedWeight }} kg
@@ -95,6 +115,9 @@ const totalWeight = ref(0);
 const allowedWeight = ref(0);
 const validationErrors = ref([]);
 const validationSuccess = ref([]);
+const isChecking = ref(false);
+const carInfo = ref(null);
+const trailerInfo = ref(null);
 
   watch(selectedLicense, (newValue) => {
     if (newValue) {
@@ -132,9 +155,27 @@ const validationSuccess = ref([]);
       allowedWeight.value = validationResult.allowedWeight;
       validationErrors.value = validationResult.errors;
       validationSuccess.value = validationResult.success;
+      carInfo.value = validationResult.carInfo;
+      trailerInfo.value = validationResult.trailerInfo;
+      isChecking.value = true; // Disable inputs and show reset button
     } else {
       alert("Kon niet alle voertuiggegevens ophalen.");
     }
+  };
+
+  const resetForm = () => {
+    // Reset all form values to initial state
+    selectedLicense.value = '';
+    carLicensePlate.value = '';
+    caravanLicensePlate.value = '';
+    result.value = null;
+    totalWeight.value = 0;
+    allowedWeight.value = 0;
+    validationErrors.value = [];
+    validationSuccess.value = [];
+    carInfo.value = null;
+    trailerInfo.value = null;
+    isChecking.value = false;
   };
   </script>
   

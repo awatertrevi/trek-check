@@ -1,9 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { 
-  validateVehicleCombination, 
-  requiresBrakes, 
-  hasBrakes, 
-  validateTowingCapacity 
+  validateVehicleCombination
 } from '../lib/vehicle-validation.js'
 
 describe('vehicle-validation', () => {
@@ -11,7 +8,9 @@ describe('vehicle-validation', () => {
   const mockCarData = {
     toegestane_maximum_massa_voertuig: '1500',
     maximum_massa_trekken_ongeremd: '700',
-    maximum_trekken_massa_geremd: '1500'
+    maximum_trekken_massa_geremd: '1500',
+    handelsbenaming: 'CADDY',
+    kenteken: 'AB123C'
   }
 
   const mockCarDataNoTowing = {
@@ -22,17 +21,18 @@ describe('vehicle-validation', () => {
 
   const mockTrailerWithBrakes = {
     toegestane_maximum_massa_voertuig: '1200',
-    remmen: 'hydraulisch'
+    handelsbenaming: 'HOBBY',
+    kenteken: 'XY456Z'
   }
 
   const mockTrailerWithoutBrakes = {
     toegestane_maximum_massa_voertuig: '600',
-    remmen: 'geen'
+    handelsbenaming: 'KNAUS',
+    kenteken: 'QW789E'
   }
 
   const mockHeavyTrailerWithoutBrakes = {
     toegestane_maximum_massa_voertuig: '1000',
-    remmen: 'geen'
   }
 
   const mockLicenseB = {
@@ -45,82 +45,7 @@ describe('vehicle-validation', () => {
     maxCombinationWeight: 7000
   }
 
-  describe('requiresBrakes', () => {
-    it('should return true for trailers over 750kg', () => {
-      expect(requiresBrakes(751)).toBe(true)
-      expect(requiresBrakes(1000)).toBe(true)
-    })
 
-    it('should return false for trailers 750kg or less', () => {
-      expect(requiresBrakes(750)).toBe(false)
-      expect(requiresBrakes(500)).toBe(false)
-    })
-  })
-
-  describe('hasBrakes', () => {
-    it('should return true when trailer has brakes', () => {
-      expect(hasBrakes(mockTrailerWithBrakes)).toBe(true)
-      expect(hasBrakes({ remmen: 'pneumatisch' })).toBe(true)
-    })
-
-    it('should return false when trailer has no brakes', () => {
-      expect(hasBrakes(mockTrailerWithoutBrakes)).toBe(false)
-      expect(hasBrakes({ remmen: 'Geen' })).toBe(false)
-      expect(hasBrakes({ remmen: 'GEEN' })).toBe(false)
-    })
-
-    it('should return false when remmen field is missing', () => {
-      expect(hasBrakes({})).toBe(false)
-      expect(hasBrakes({ remmen: null })).toBe(false)
-    })
-  })
-
-  describe('validateTowingCapacity', () => {
-    it('should validate braked towing capacity correctly', () => {
-      const result = validateTowingCapacity(mockCarData, 1200, true)
-      expect(result).toEqual({
-        canTow: true,
-        maxWeight: 1500,
-        type: 'braked'
-      })
-    })
-
-    it('should validate unbraked towing capacity correctly', () => {
-      const result = validateTowingCapacity(mockCarData, 600, false)
-      expect(result).toEqual({
-        canTow: true,
-        maxWeight: 700,
-        type: 'unbraked'
-      })
-    })
-
-    it('should return false when exceeding braked capacity', () => {
-      const result = validateTowingCapacity(mockCarData, 1600, true)
-      expect(result).toEqual({
-        canTow: false,
-        maxWeight: 1500,
-        type: 'braked'
-      })
-    })
-
-    it('should return false when exceeding unbraked capacity', () => {
-      const result = validateTowingCapacity(mockCarData, 800, false)
-      expect(result).toEqual({
-        canTow: false,
-        maxWeight: 700,
-        type: 'unbraked'
-      })
-    })
-
-    it('should handle missing towing data', () => {
-      const result = validateTowingCapacity(mockCarDataNoTowing, 500, false)
-      expect(result).toEqual({
-        canTow: false,
-        maxWeight: 0,
-        type: 'unknown'
-      })
-    })
-  })
 
   describe('validateVehicleCombination', () => {
     it('should validate a valid combination with license B', () => {
@@ -134,7 +59,17 @@ describe('vehicle-validation', () => {
       expect(result.totalWeight).toBe(2100) // 1500 + 600
       expect(result.allowedWeight).toBe(3500)
       expect(result.errors).toHaveLength(0)
-      expect(result.success).toHaveLength(3) // License weight, brake requirement, towing capacity
+      expect(result.success).toHaveLength(2) // License weight + towing capacity
+      expect(result.carInfo).toEqual({
+        handelsbenaming: 'CADDY',
+        kenteken: 'AB123C',
+        gewicht: 1500
+      })
+      expect(result.trailerInfo).toEqual({
+        handelsbenaming: 'KNAUS',
+        kenteken: 'QW789E',
+        gewicht: 600
+      })
     })
 
     it('should validate a valid combination with license BE', () => {
@@ -148,7 +83,7 @@ describe('vehicle-validation', () => {
       expect(result.totalWeight).toBe(2700) // 1500 + 1200
       expect(result.allowedWeight).toBe(7000)
       expect(result.errors).toHaveLength(0)
-      expect(result.success).toHaveLength(3)
+      expect(result.success).toHaveLength(2) // License weight + towing capacity
     })
 
     it('should fail when total weight exceeds license limit', () => {
@@ -162,7 +97,7 @@ describe('vehicle-validation', () => {
       expect(result.errors).toContain('❌ Totaalgewicht (4000kg) overschrijdt de limiet voor rijbewijs B (3500kg)')
     })
 
-    it('should pass when heavy trailer automatically has brakes', () => {
+    it('should validate heavy trailer correctly', () => {
       const result = validateVehicleCombination(
         mockCarData, 
         mockHeavyTrailerWithoutBrakes, 
@@ -170,7 +105,7 @@ describe('vehicle-validation', () => {
       )
       
       expect(result.isValid).toBe(true)
-      expect(result.success).toContain('✅ Aanhangwagen heeft verplichte remmen (gewicht: 1000kg > 750kg)')
+      expect(result.success).toContain('✅ Auto kan aanhangwagen trekken (1000kg ≤ 1500kg geremd)')
     })
 
     it('should fail when car cannot tow the trailer', () => {
@@ -187,7 +122,7 @@ describe('vehicle-validation', () => {
       )
       
       expect(result.isValid).toBe(false)
-      expect(result.errors).toContain('❌ Aanhangwagen te zwaar voor auto met remmen (1200kg > 800kg)')
+      expect(result.errors).toContain('❌ Aanhangwagen te zwaar voor auto (1200kg > 800kg geremd)')
     })
 
     it('should handle missing data gracefully', () => {
@@ -209,60 +144,33 @@ describe('vehicle-validation', () => {
     })
 
     it('should handle edge case: exactly 750kg trailer', () => {
-      const carWithHigherTowing = {
-        ...mockCarData,
-        maximum_massa_trekken_ongeremd: '800'  // Can tow 750kg
-      }
       const trailer750kg = {
-        toegestane_maximum_massa_voertuig: '750',
-        remmen: 'geen'
+        toegestane_maximum_massa_voertuig: '750'
       }
       
       const result = validateVehicleCombination(
-        carWithHigherTowing, 
+        mockCarData, 
         trailer750kg, 
         mockLicenseB
       )
       
       expect(result.isValid).toBe(true)
-      expect(result.success).toContain('✅ Aanhangwagen weegt minder dan 750kg (750kg), geen remmen vereist')
-    })
-
-    it('should handle edge case: exactly 751kg trailer automatically has brakes', () => {
-      const carWithHigherTowing = {
-        ...mockCarData,
-        maximum_trekken_massa_geremd: '800'  // Can tow 751kg with brakes
-      }
-      const trailer751kg = {
-        toegestane_maximum_massa_voertuig: '751',
-        remmen: 'geen'  // RDW data says no brakes, but we assume it has them due to weight
-      }
-      
-      const result = validateVehicleCombination(
-        carWithHigherTowing, 
-        trailer751kg, 
-        mockLicenseB
-      )
-      
-      expect(result.isValid).toBe(true)
-      expect(result.success).toContain('✅ Aanhangwagen heeft verplichte remmen (gewicht: 751kg > 750kg)')
+      expect(result.success).toContain('✅ Auto kan aanhangwagen trekken (750kg ≤ 1500kg geremd)')
     })
 
     it('should validate multiple failure scenarios', () => {
       const heavyCar = { ...mockCarData, toegestane_maximum_massa_voertuig: '3200' }
-      const heavyTrailerNoBreaks = {
-        toegestane_maximum_massa_voertuig: '1000',
-        remmen: 'geen'
+      const heavyTrailer = {
+        toegestane_maximum_massa_voertuig: '1000'
       }
       
-      const result = validateVehicleCombination(heavyCar, heavyTrailerNoBreaks, mockLicenseB)
+      const result = validateVehicleCombination(heavyCar, heavyTrailer, mockLicenseB)
       
       expect(result.isValid).toBe(false)
-      expect(result.errors).toHaveLength(1) // Only weight limit (trailer automatically has brakes, so towing capacity uses braked limit)
+      expect(result.errors).toHaveLength(1) // Only weight limit 
       expect(result.totalWeight).toBe(4200)
       expect(result.errors).toContain('❌ Totaalgewicht (4200kg) overschrijdt de limiet voor rijbewijs B (3500kg)')
-      expect(result.success).toContain('✅ Aanhangwagen heeft verplichte remmen (gewicht: 1000kg > 750kg)')
-      expect(result.success).toContain('✅ Auto kan aanhangwagen met remmen trekken (1000kg ≤ 1500kg)')
+      expect(result.success).toContain('✅ Auto kan aanhangwagen trekken (1000kg ≤ 1500kg geremd)')
     })
   })
 })
